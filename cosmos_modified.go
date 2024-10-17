@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+
+
+
 	"github.com/Azure/azure-sdk-for-go/sdk/data/azcosmos"
 )
 
