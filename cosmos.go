@@ -4,29 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	"github.com/Azure/azure-sdk-for-go/sdk/data/azcosmos"
 )
 
-func startCosmos(writeOutput func(msg string)) error {
 
-	const connectionString = "<azure-cosmos-db-nosql-connection-string>"
 
-	clientOptions := azcosmos.ClientOptions{
 		EnableContentResponseOnWrite: true,
 	}
 	
-	client, err := azcosmos.NewClientFromConnectionString(connectionString, nil)
 	if err != nil {
 		return err
 	}
 
 	writeOutput("Current Status:\tStarting...")
 
-	database, err := client.NewDatabase("cosmicworks")
 	if err != nil {
 		return err
 	}
@@ -50,7 +41,6 @@ func startCosmos(writeOutput func(msg string)) error {
 			Clearance:	false,
 		}
 
-		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
 		context := context.TODO()
 
@@ -86,7 +76,6 @@ func startCosmos(writeOutput func(msg string)) error {
 			Clearance:	true,
 		}
 
-		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
 		context := context.TODO()
 
@@ -114,7 +103,6 @@ func startCosmos(writeOutput func(msg string)) error {
 	}
 
 	{
-		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
 		context := context.TODO()
 
@@ -141,12 +129,9 @@ func startCosmos(writeOutput func(msg string)) error {
 	}
 
 	{
-		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
 		query := "SELECT * FROM products p WHERE p.category = @category"
 
-		queryOptions := azcosmos.QueryOptions{
-			QueryParameters: []azcosmos.QueryParameter{
 				{Name: "@category", Value: "gear-surf-surfboards"},
 			},
 		}
