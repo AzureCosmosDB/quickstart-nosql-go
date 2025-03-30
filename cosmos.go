@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-
+	"log"
+	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
-
 
 	"github.com/Azure/azure-sdk-for-go/sdk/data/azcosmos"
 )
@@ -25,7 +25,7 @@ func startCosmos(writeOutput func(msg string)) error {
 	clientOptions := azcosmos.ClientOptions{
 		EnableContentResponseOnWrite: true,
 	}
-	
+
 	client, err := azcosmos.NewClientFromConnectionString(connectionString, &clientOptions)
 	if err != nil {
 		return err
@@ -69,25 +69,25 @@ func startCosmos(writeOutput func(msg string)) error {
 
 		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
-		context := context.TODO()
+		ctx := context.TODO()
 
 		bytes, err := json.Marshal(item)
 		if err != nil {
 			return err
 		}
 
-		response, err := container.UpsertItem(context, partitionKey, bytes, nil)
+		response, err := container.UpsertItem(ctx, partitionKey, bytes, nil)
 		if err != nil {
 			return err
 		}
 
-		if response.RawResponse.StatusCode == 200 || response.RawResponse.StatusCode == 201 {
-			created_item := Item{}
-			err := json.Unmarshal(response.Value, &created_item)
+		if response.RawResponse.StatusCode == http.StatusOK || response.RawResponse.StatusCode == http.StatusCreated {
+			createdItem := Item{}
+			err := json.Unmarshal(response.Value, &createdItem)
 			if err != nil {
 				return err
 			}
-			writeOutput(fmt.Sprintf("Upserted item:\t%v", created_item))
+			writeOutput(fmt.Sprintf("Upserted item:\t%v", createdItem))
 		}
 		writeOutput(fmt.Sprintf("Status code:\t%d", response.RawResponse.StatusCode))
 		writeOutput(fmt.Sprintf("Request charge:\t%.2f", response.RequestCharge))
@@ -105,25 +105,25 @@ func startCosmos(writeOutput func(msg string)) error {
 
 		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
-		context := context.TODO()
+		ctx := context.TODO()
 
 		bytes, err := json.Marshal(item)
 		if err != nil {
 			return err
 		}
 
-		response, err := container.UpsertItem(context, partitionKey, bytes, nil)
+		response, err := container.UpsertItem(ctx, partitionKey, bytes, nil)
 		if err != nil {
 			return err
 		}
 
-		if response.RawResponse.StatusCode == 200 || response.RawResponse.StatusCode == 201 {
-			created_item := Item{}
-			err := json.Unmarshal(response.Value, &created_item)
+		if response.RawResponse.StatusCode == http.StatusOK || response.RawResponse.StatusCode == http.StatusCreated {
+			createdItem := Item{}
+			err := json.Unmarshal(response.Value, &createdItem)
 			if err != nil {
 				return err
 			}
-			writeOutput(fmt.Sprintf("Upserted item:\t%v", created_item))
+			writeOutput(fmt.Sprintf("Upserted item:\t%v", createdItem))
 		}
 		writeOutput(fmt.Sprintf("Status code:\t%d", response.RawResponse.StatusCode))
 		writeOutput(fmt.Sprintf("Request charge:\t%.2f", response.RequestCharge))
@@ -133,24 +133,24 @@ func startCosmos(writeOutput func(msg string)) error {
 	{
 		partitionKey := azcosmos.NewPartitionKeyString("gear-surf-surfboards")
 
-		context := context.TODO()
+		ctx := context.TODO()
 
 		itemId := "aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb"
 
-		response, err := container.ReadItem(context, partitionKey, itemId, nil)
+		response, err := container.ReadItem(ctx, partitionKey, itemId, nil)
 		if err != nil {
 			return err
 		}
 
-		if response.RawResponse.StatusCode == 200 {
-			read_item := Item{}
-			err := json.Unmarshal(response.Value, &read_item)
+		if response.RawResponse.StatusCode == http.StatusOK {
+			readItem := Item{}
+			err := json.Unmarshal(response.Value, &readItem)
 			if err != nil {
 				return err
 			}
 
-			writeOutput(fmt.Sprintf("Read item id:\t%s", read_item.Id))
-			writeOutput(fmt.Sprintf("Read item:\t%v", read_item))
+			writeOutput(fmt.Sprintf("Read item id:\t%s", readItem.Id))
+			writeOutput(fmt.Sprintf("Read item:\t%v", readItem))
 		}
 
 		writeOutput(fmt.Sprintf("Status code:\t%d", response.RawResponse.StatusCode))
@@ -170,14 +170,14 @@ func startCosmos(writeOutput func(msg string)) error {
 
 		pager := container.NewQueryItemsPager(query, partitionKey, &queryOptions)
 
-		context := context.TODO()
+		ctx := context.TODO()
 
-		items := []Item{}
+		var items []Item
 
 		requestCharge := float32(0)
 
 		for pager.More() {
-			response, err := pager.NextPage(context)
+			response, err := pager.NextPage(ctx)
 			if err != nil {
 				return err
 			}
